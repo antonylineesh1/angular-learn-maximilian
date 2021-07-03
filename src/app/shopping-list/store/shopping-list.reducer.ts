@@ -6,20 +6,49 @@ const initalState = {
   ingredients: [new Ingredient("Apples", 5), new Ingredient("Tomatoes", 10)],
 };
 
-export function ShoppingListReducer(state = initalState, action:any) {
+export function ShoppingListReducer(state = initalState, action:shoppinglistActions.ShoppingListActions) {
 
     switch (action.type) {
-        case shoppinglistActions.ADD_INGREDIENT:
-            return {
-                ...state,
-                ingredients:[ ...state.ingredients,action.payload ]
-             }           
-        case shoppinglistActions.ADD_INGREDIENTS:
-            return {
-                ...state,
-                ingredients:[ ...state.ingredients,...action.payload]
-                }           
-         default:
-            return state;
+      case shoppinglistActions.ADD_INGREDIENT:
+        return {
+          ...state,
+          ingredients: [...state.ingredients, action.payload],
+        };
+      case shoppinglistActions.ADD_INGREDIENTS:
+        return {
+          ...state,
+          ingredients: [
+            ...state.ingredients,
+            ...(action.payload as Ingredient[]),
+          ],
+        };
+      case shoppinglistActions.UPDATE_INGREDIENTS:
+        if ("index" in action.payload && "newIngredient" in action.payload) {
+          const { index, newIngredient } = action.payload;
+          const existingIngredient = state.ingredients.find(
+            (x, i) => i === index
+          );
+          const newMergedIngredient = {
+            ...existingIngredient,
+            ...newIngredient,
+          };
+          const existingIngredients = [...state.ingredients];
+          existingIngredients[index] = newMergedIngredient;
+
+          return {
+            ...state,
+            ingredients: [...existingIngredients],
+          };
+        }
+      case shoppinglistActions.DELETE_INGREDIENTS:
+        if ("index" in action.payload) {
+          const { index } = action.payload;
+          return {
+            ...state,
+            ingredients: state.ingredients.filter((x, i) => i === index),
+          };
+        }
+      default:
+        return state;
     }
 }
