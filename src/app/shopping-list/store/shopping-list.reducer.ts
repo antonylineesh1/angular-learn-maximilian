@@ -20,7 +20,7 @@ const initalState = {
   editedIngredientIndex:-1
 };
 
-export function ShoppingListReducer(state:ShoppingListState = initalState, action:shoppinglistActions.ShoppingListActions) {
+export function ShoppingListReducer(state:ShoppingListState = initalState, action:any) {
 
     switch (action.type) {
       case shoppinglistActions.ADD_INGREDIENT:
@@ -62,6 +62,20 @@ export function ShoppingListReducer(state:ShoppingListState = initalState, actio
             ingredients: state.ingredients.filter((x, i) => i === index),
           };
         }
+      case shoppinglistActions.START_EDIT:
+        const tt=state;
+        debugger;
+        return {
+          ...state,
+          editedIngredient:{...state.ingredients[action.payload]},
+          editedIngredientIndex:action.payload
+        };        
+      case shoppinglistActions.STOP_EDIT:
+        return {
+          ...state,
+          editedIngredient:null,
+          editedIngredientIndex:-1
+        };
       default:
         return state;
     }
