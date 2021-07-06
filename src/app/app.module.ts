@@ -9,7 +9,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core.module';
 import { StoreModule } from '@ngrx/store';
-import { ShoppingListReducer } from './shopping-list/store/shopping-list.reducer';
+import { rootReducer } from './store/app.reducer';
 
 
 @NgModule({
@@ -25,7 +25,7 @@ import { ShoppingListReducer } from './shopping-list/store/shopping-list.reducer
     AppRoutingModule,
     SharedModule,
     CoreModule,
-    StoreModule.forRoot({shoppingList:ShoppingListReducer})
+    StoreModule.forRoot(rootReducer)
   ],
   bootstrap: [AppComponent]
 })
