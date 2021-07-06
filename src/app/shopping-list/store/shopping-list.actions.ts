@@ -21,12 +21,12 @@ export class AddIngredients implements Action{
 }
 export class UpdateIngredients implements Action {
   type: string = UPDATE_INGREDIENTS;
-  constructor(public payload:{index: number,newIngredient: Ingredient} ) {}
+  constructor(public payload:Ingredient ) {}
 }
 export class DeleteIngredients implements Action{
     type:string=DELETE_INGREDIENTS;
-    constructor(public payload:{index: number}){}
 }
+
 export class StartEdit implements Action {
     type:string=START_EDIT;
     constructor(public payload:number){}
