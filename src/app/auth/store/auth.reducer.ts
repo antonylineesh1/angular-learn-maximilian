@@ -3,10 +3,14 @@ import * as fromAuth from "../store/auth.actions";
 
 export interface State {
   user: User;
+  authError:string,
+  isLoading:boolean
 }
 
 export const initialState: State = {
   user: null,
+  authError:null,
+  isLoading:false
 };
 
 export function authReducer(state: State = initialState, action: any) {
@@ -16,6 +20,8 @@ export function authReducer(state: State = initialState, action: any) {
       return {
         ...state,
         user: new User(email, userId, token, expirationDate),
+        authError:null,
+        isLoading:false
       };
       
     case fromAuth.LOGOUT:
@@ -24,6 +30,19 @@ export function authReducer(state: State = initialState, action: any) {
         user: null,
       };
 
+    case fromAuth.LOGIN_START:
+      return {
+        ...state,
+        authError:null,
+        isLoading:true
+      }
+    case fromAuth.LOGIN_FAIL:
+      console.log('..............inside auth reducer..............');
+      return {
+        ...state,
+        authError:action.payload,
+        isLoading:false
+      }
     default:
       return state;
   }

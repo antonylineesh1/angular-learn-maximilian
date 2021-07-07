@@ -1,10 +1,11 @@
 import { Actions, Effect, ofType } from "@ngrx/effects";
-import { catchError, map, switchMap } from "rxjs/operators";
+import { catchError, map, switchMap, tap } from "rxjs/operators";
 import * as authActions from "../store/auth.actions";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { of } from "rxjs";
 import { Injectable } from "@angular/core";
+import { Router } from '@angular/router';
 
 export interface AuthResponseData {
   kind: string;
@@ -18,7 +19,7 @@ export interface AuthResponseData {
 
 @Injectable()
 export class AuthEffects {
-  constructor(private actions$: Actions, private http: HttpClient) {}
+  constructor(private actions$: Actions, private http: HttpClient,private router:Router) {}
 
   @Effect()
   authLogin = this.actions$.pipe(
@@ -38,19 +39,41 @@ export class AuthEffects {
             const expirationDate = new Date(
               new Date().getTime() + +resData.expiresIn * 1000
             );
-            return of(
-              new authActions.Login({
+            return new authActions.Login({
                 email: resData.email,
                 userId: resData.localId,
                 token: resData.idToken,
                 expirationDate: expirationDate,
-              })
-            );
+              });
           }),
-          catchError((err) => {
-            return of(err);
+          catchError((errorRes:any) => {
+            
+            console.log('error occured');
+            let errorMessage = 'An unknown error occurred!';
+            if (!errorRes.error || !errorRes.error.error) {
+              return of(new authActions.LoginFail(errorMessage));
+            }
+            switch (errorRes.error.error.message) {
+              case 'EMAIL_EXISTS':
+                errorMessage = 'This email exists already';
+                break;
+              case 'EMAIL_NOT_FOUND':
+                errorMessage = 'This email does not exist.';
+                break;
+              case 'INVALID_PASSWORD':
+                errorMessage = 'This password is not correct.';
+                break;
+            }
+
+            return of(new authActions.LoginFail(errorMessage));
           })
         );
     })
   );
+
+  @Effect({dispatch:false})
+  authSucess=this.actions$.pipe(ofType(authActions.LOGIN),tap(()=>{
+    this.router.navigate(['/']);
+  }))
+
 }
